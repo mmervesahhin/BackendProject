@@ -1,9 +1,9 @@
 <?php
 
   // connection string
-  const DSN = "mysql:host=localhost;port=8889;dbname=project;charset=utf8mb4" ;
+  const DSN = "mysql:host=localhost;port=3306;dbname=project;charset=utf8mb4" ;
   const USER = "root" ;
-  const PASSWORD = "root" ; 
+  const PASSWORD = "" ; 
 
   // connect to database, $db represents mysql dbms
   $db = new PDO(DSN, USER, PASSWORD) ; 
