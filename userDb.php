@@ -1,7 +1,7 @@
 <?php
 
   // connection string
-  const DSN = "mysql:host=localhost;port=3306;dbname=test;charset=utf8mb4" ;
+  const DSN = "mysql:host=localhost;port=3306;dbname=project;charset=utf8mb4" ;
   const USER = "root" ;
   const PASSWORD = "" ; 
 
@@ -38,19 +38,21 @@ function seeUser($email) {
 }
 
 function searchFriend($friend){
-   $sql = "SELECT email FROM users";
+   $sql = "SELECT email,name,surname,pp,id FROM users";
    global $db;
   
    $result = $db->query($sql);
    
    if ($result->rowCount() > 0 ) {
        while ($row = $result->fetch()) {
-         if($friend==$row["email"])
-           echo "You can add " . $row["email"] . "<br>";
+         if($friend==$row["email"] || $friend==$row["name"] || $friend==$row["surname"]){
+           ?> <span class="invisible"><?=$row["id"] ?></span><img <?= 'src="./images/' . $row["pp"] . '" alt="Image"' ?> width="30" height="30" style="border-radius: 50%;">
+            <?php echo "".$row["name"] ." " .$row["surname"]." (".$row["email"].")" ?> <i class="fa-solid fa-plus"></i> <?php echo "<br>";
+            }
        }
-       
+      
    } else {
-       echo "There is no such a friend with this e-mail address.";
+       echo "There is no such user";
    }
 }
 
@@ -64,3 +66,14 @@ function getUser($email) {
   function validSession() {
    return isset($_SESSION["user"]) ;
 }
+
+function sendFriendRequest($id,$user_id,$type,$content){
+  global $db;
+  try{
+    $stmt=$db->prepare("insert into notifications (id,user_id,type,content) values (?, ?, ?, ?)");
+    $stmt->execute([$id,$user_id,$type,$content]);
+    // $id = $db->lastInsertId() ;
+    return ["id" => $id, "user_id" => $user_id, "type" => $type, "content" => $content];
+  } catch(PDOException $e) {
+  return ["error" => "API Error"] ;
+}}

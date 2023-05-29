@@ -13,7 +13,6 @@
     <form method="post">
         <button type="submit" name="login">Login</button>
         <button type="submit" name="register">Register</button>
-
     </form>
     
     <?php
