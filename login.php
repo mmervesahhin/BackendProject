@@ -44,7 +44,8 @@
         <br><br>
         <button type="submit">Enter</button>
     </form>
-    
+    <br><br><br>
+    <button><a style="text-decoration:none; color:inherit;" href="mainPage.php"> Go Back to the Welcome Page</a></button>
 
     <?php
       // Authentication Error Message

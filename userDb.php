@@ -20,7 +20,7 @@
    return false ; 
 }
 
-function seeUser($email) {
+/* function seeUser($email) {
    $sql = "SELECT email FROM users";
    global $db;
   
@@ -35,7 +35,7 @@ function seeUser($email) {
    } else {
        echo "Kayıt bulunamadı.";
    }
-}
+} */
 
 function searchFriend($friend,$id){
   global $db;

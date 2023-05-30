@@ -47,13 +47,14 @@ CREATE TABLE IF NOT EXISTS `friends` (
 
 DROP TABLE IF EXISTS `notifications`;
 CREATE TABLE IF NOT EXISTS `notifications` (
-  `id` int(100) NOT NULL,
-  `user_id` int(100) NOT NULL,
+  `id` int(100) NOT NULL AUTO_INCREMENT,
+  `from_id` int(100) NOT NULL,
+  `to_user_id` int(100) NOT NULL,
   `type` VARCHAR(255) NOT NULL,
   `content` VARCHAR(255),
    timestamp TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY (`id`),
-  FOREIGN KEY (`user_id`) REFERENCES users(`id`)
+  FOREIGN KEY (`to_user_id`) REFERENCES users(`id`)
 ) ENGINE=MyISAM DEFAULT CHARSET=latin1;
 
 INSERT INTO `users` (`email`, `password`, `name`, `surname`, `pp`, `birth_date`) 

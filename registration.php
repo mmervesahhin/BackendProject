@@ -50,5 +50,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         <p>Profile Picture : <input type="file" name="pp" ></p>
         <p><button>Register</button></p>
     </form>
+
+    <br><br><br>
+    <button><a style="text-decoration:none; color:inherit;" href="mainPage.php"> Go Back to the Welcome Page</a></button>
 </body>
 </html>

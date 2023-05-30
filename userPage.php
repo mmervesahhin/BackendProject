@@ -45,25 +45,28 @@
     <?php
      if ( isset($_POST["btnFriend"])) {
         extract($_POST);
-        $searched=searchFriend($friendSearch,$userData["id"]);
+        if(!empty($friendSearch)){
+            $searched=searchFriend($friendSearch,$userData["id"]);
+        }
      }
     ?>
         <br>
     
     <?php
 
+    if(!empty($friendSearch)){
      foreach($searched as $s){
         ?>
         <form action="search.php" method="POST">
-        <input type="hidden" name="gonderen" value="<?= $userData["id"] ?>">
-        <input type="hidden" name="alan" value="<?= $s["id"] ?>">
+        <input type="hidden" name="sender" value="<?= $userData["id"] ?>">
+        <input type="hidden" name="receiver" value="<?= $s["id"] ?>">
         <?php echo "<div>";
        
         echo "<img style='border-radius:50%; width:30px; height:30px;' src='images/".$s["pp"]."'";
         echo "<span> <div class='invisible'>".$s["id"]."</div>".$s["name"] . " ".$s["surname"]." (". $s["email"]. ") <input type='submit' name='sbmtBtn' value='Send a Request' id='sendRequest'></span> ";
         echo "</div>";
         echo " </form>";
-     }
+     }}
     ?>
    <!-- <script>
         $(document).ready(function(){
@@ -129,7 +132,7 @@
         
     </script> -->
 
-<?php seeUser($userData["email"]);?>
+<!-- <?php seeUser($userData["email"]);?> -->
 
 </body>
 </html>
