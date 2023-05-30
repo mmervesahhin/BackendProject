@@ -9,7 +9,6 @@
  
   $userData = $_SESSION["user"] ;
 //   $userData = getUser($token) ;
- 
 ?>
 
 <!DOCTYPE html>
@@ -19,12 +18,12 @@
     <link rel="stylesheet"  href="style.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.1/css/all.min.css" integrity="sha512-KfkfwYDsLkIlwQp6LFnl8zNdLGxu9YAA1QvwINks4PhcElQSvqcyVLLD9aMhXd13uQjoXtEKNosOWaZqXgel0g==" crossorigin="anonymous" referrerpolicy="no-referrer" />
     <script src="jquery-3.7.0.min.js"></script>
-    <script src="add-remove.js"></script>
 </head>
 <body>
 
     <h3>Welcome <?= $userData["name"] ?> (<?= $userData["email"] ?>)</h3>
 
+    
     <script>
     var userData = <?php echo json_encode($userData); ?>;
     </script>
@@ -40,16 +39,60 @@
     <form action="" method="post">
     <input type="text" id="searchText" name="friendSearch">
     <input type="submit" value="Search Friend" name="btnFriend">
-
+    </form>
     <div id="searchPart">
         <br>
     <?php
      if ( isset($_POST["btnFriend"])) {
         extract($_POST);
-        searchFriend($friendSearch);
+        $searched=searchFriend($friendSearch,$userData["id"]);
      }
     ?>
         <br>
+    
+    <?php
+
+     foreach($searched as $s){
+        ?>
+        <form action="search.php" method="POST">
+        <input type="hidden" name="gonderen" value="<?= $userData["id"] ?>">
+        <input type="hidden" name="alan" value="<?= $s["id"] ?>">
+        <?php echo "<div>";
+       
+        echo "<img style='border-radius:50%; width:30px; height:30px;' src='images/".$s["pp"]."'";
+        echo "<span> <div class='invisible'>".$s["id"]."</div>".$s["name"] . " ".$s["surname"]." (". $s["email"]. ") <input type='submit' name='sbmtBtn' value='Send a Request' id='sendRequest'></span> ";
+        echo "</div>";
+        echo " </form>";
+     }
+    ?>
+   <!-- <script>
+        $(document).ready(function(){
+            $("#sendRequest").click(function(){
+                
+                $.ajax({
+                    url: "search.php",
+                    method: "POST",
+                    success:function(response){
+                        alert("oldu");
+                        // $requestedFriend=$(this).prev();
+                        // $type="Friendship Request";
+                        // $content="Would you like to be friends?";
+                        // $("#sendRequest").removeClass("fa-plus").addClass("fa-minus");
+                        // console.log($requestedFriend);
+                        // console.log($type);
+                        // console.log($content);
+                        // sendFriendRequest($userData["id"],$requestedFriend,$type,$content);
+                    },
+                    error: function(){
+                        alert("Error!");
+                    }
+                })
+            })
+
+        })
+       
+    </script>
+     -->
     <p id="error"></p>
     </div>
 
@@ -64,7 +107,7 @@
         </div>
         <!-- Add more posts here -->
     </div>
-    </form>
+   
     <button id="next-button">Next</button>
 
     <br><br>

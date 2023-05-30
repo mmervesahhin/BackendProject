@@ -20,11 +20,9 @@
     if ($_SERVER["REQUEST_METHOD"] == "POST"){
 
         if (isset($_POST["login"])) {
-            // Redirect to page1.php
             header("Location: ./login.php");
             exit;
         } elseif (isset($_POST["register"])) {
-            // Redirect to page2.php
             header("Location: ./registration.php");
             exit;
         }

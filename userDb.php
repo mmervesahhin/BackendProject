@@ -37,23 +37,27 @@ function seeUser($email) {
    }
 }
 
-function searchFriend($friend){
-   $sql = "SELECT email,name,surname,pp,id FROM users";
-   global $db;
+function searchFriend($friend,$id){
+  global $db;
+   $stmt = $db->prepare("SELECT * FROM users where (name=? or surname=? or email=?) and id != ? ");
+   $stmt->execute([$friend,$friend,$friend,$id]);
+
+  return $stmt->fetchAll();
   
-   $result = $db->query($sql);
+  //  $result = $db->query($sql);
    
-   if ($result->rowCount() > 0 ) {
-       while ($row = $result->fetch()) {
-         if($friend==$row["email"] || $friend==$row["name"] || $friend==$row["surname"]){
-           ?> <span class="invisible"><?=$row["id"] ?></span><img <?= 'src="./images/' . $row["pp"] . '" alt="Image"' ?> width="30" height="30" style="border-radius: 50%;">
-            <?php echo "".$row["name"] ." " .$row["surname"]." (".$row["email"].")" ?> <i class="fa-solid fa-plus"></i> <?php echo "<br>";
-            }
-       }
+  //  if ($result->rowCount() > 0 ) {
+  //      while ($row = $result->fetch()) {
+  //        if($friend==$row["email"] || $friend==$row["name"] || $friend==$row["surname"]){
+  //          ?> <span class="invisible"><?=$row["id"] ?></span><img <?= 'src="./images/' . $row["pp"] . '" alt="Image"' ?> width="30" height="30" style="border-radius: 50%;">
+  //           <?php echo "".$row["name"] ." " .$row["surname"]." (".$row["email"].")" ?> <i class="fa-solid fa-plus"></i> <?php echo "<br>";
+           
+  //         }
+  //      }
       
-   } else {
-       echo "There is no such user";
-   }
+  //  } else {
+  //      echo "There is no such user";
+  //  }
 }
 
 function getUser($email) {
@@ -67,7 +71,7 @@ function getUser($email) {
    return isset($_SESSION["user"]) ;
 }
 
-function sendFriendRequest($id,$user_id,$type,$content){
+function sendFriendRequest($id,$user_id,$type,$content){  //
   global $db;
   try{
     $stmt=$db->prepare("insert into notifications (id,user_id,type,content) values (?, ?, ?, ?)");
@@ -75,5 +79,5 @@ function sendFriendRequest($id,$user_id,$type,$content){
     // $id = $db->lastInsertId() ;
     return ["id" => $id, "user_id" => $user_id, "type" => $type, "content" => $content];
   } catch(PDOException $e) {
-  return ["error" => "API Error"] ;
+  return ["error" => "Error"] ;
 }}
