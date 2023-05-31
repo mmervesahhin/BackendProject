@@ -10,12 +10,33 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $surname = $_POST['surname'];
     $birthDate = $_POST['birth_date'];
 
+    $regex = '/(\w+)@((?:\w+\.){1,3}(?:com|tr))/iu' ;
     // Upload profile picture
     $profilePicture = new Upload("pp", "images");
 
+    $a=0;
+    $b=0;
+
     if ($profilePicture->error) {
-        echo "Error: " . $profilePicture->error;
-    } else {
+        $a++;
+    } 
+
+    if (!(preg_match_all($regex,$email))) {
+        $b++;
+    } 
+
+    if($a!==0 || $b!==0){
+        if($a>0){
+            echo "Error: " . $profilePicture->error . "<br>";
+        }
+        if($b>0){
+            echo "Error: " . $email . " is invalid. ";
+        }
+        
+        
+    }
+
+    else {
         $hashedPassword = password_hash($password, PASSWORD_BCRYPT);
 
         // Insert user data into the database
@@ -25,7 +46,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         // Redirect to a success page or display a success message
         header("Location: success.php");
         exit;
-    }
+    }    
 }
 ?>
 
@@ -42,16 +63,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 <body>
 <h1>Register</h1>
     <form action="" method="post" enctype="multipart/form-data">
-        <p>Email : <input type="text" name="email" ></p>
+        <p>Email : <input type="text" name="email" value="<?= $email ?? "" ?>"></p>
         <p>Passw : <input type="password" name="pass" ></p>
-        <p>Name : <input type="text" name="name" ></p>
-        <p>Surname : <input type="text" name="surname" ></p>
-        <p>Birth Date: <input type="date" name="birth_date"></p>
-        <p>Profile Picture : <input type="file" name="pp" ></p>
+        <p>Name : <input type="text" name="name"  value="<?= $name ?? "" ?>"></p>
+        <p>Surname : <input type="text" name="surname" value="<?= $surname ?? "" ?>"></p>
+        <p>Birth Date: <input type="date" name="birth_date" value="<?= $birthDate ?? "" ?>"></p>
+        <p>Profile Picture : <input type="file" name="pp" value="<?= $pp ?? "" ?>"></p>
         <p><button>Register</button></p>
     </form>
-
-    <br><br><br>
-    <button><a style="text-decoration:none; color:inherit;" href="mainPage.php"> Go Back to the Welcome Page</a></button>
 </body>
 </html>

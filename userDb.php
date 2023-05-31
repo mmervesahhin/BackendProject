@@ -1,7 +1,7 @@
 <?php
 
   // connection string
-  const DSN = "mysql:host=localhost;port=3306;dbname=project;charset=utf8mb4" ;
+  const DSN = "mysql:host=localhost;port=3306;dbname=test;charset=utf8mb4" ;
   const USER = "root" ;
   const PASSWORD = "" ; 
 
