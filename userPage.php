@@ -18,8 +18,13 @@ $userData = $_SESSION["user"];
     <link rel="stylesheet" href="style.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.1/css/all.min.css" integrity="sha512-KfkfwYDsLkIlwQp6LFnl8zNdLGxu9YAA1QvwINks4PhcElQSvqcyVLLD9aMhXd13uQjoXtEKNosOWaZqXgel0g==" crossorigin="anonymous" referrerpolicy="no-referrer" />
     <script src="jquery-3.7.0.min.js"></script>
+    <script src="action.js"></script>
     </head>
 <body>
+
+    <div style="position: fixed; bottom: 0; right: 0;">
+        <button><a id="logout" href="logout.php">Logout</a></button>
+    </div>
 
     <h3>Welcome <?= $userData["name"] ?> (<?= $userData["email"] ?>)</h3>
 
@@ -115,56 +120,65 @@ $userData = $_SESSION["user"];
 
     <div id="timeline">
         <div class="post">
-            <h3>Post 1</h3>
-            <p>This is the content of the first post.</p>
+            <?php
+                    // Select all posts from the "posts" table
+                    $sql = "SELECT * FROM posts";
+                    $stmt = $db->query($sql);
+                    
+                    // Check if there are any posts
+                    if ($stmt->rowCount() > 0) {
+                        // Output data of each row
+                        while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
+                            // Display post content
+                            echo '<div class="post">';
+                            echo '<img src="./posts/' . $row["content"] . '" alt="Image" width="100" height="100">';
+                            echo '</div>';
+                        }
+                    } else {
+                        echo "No posts found.";
+                    }
+                ?>
         </div>
-        <div class="post">
-            <h3>Post 2</h3>
-            <p>This is the content of the second post.</p>
-        </div>
-        <!-- Add more posts here -->
     </div>
 
-    <button id="next-button">Next</button>
+    <br>
 
-    <br><br>
+    <form action="" method="post" enctype="multipart/form-data">
+        <input type="submit" value="Add Post" name="btnAddPost">
+        <input type="file" name="content" id="content">
+    </form>
 
-    <div>
-        <button><a id="logout" href="logout.php">Logout</a></button>
-    </div>
+    <?php 
 
-    <script>
-        function toggleNotifications() {
-            var container = document.getElementById('notificationsContainer');
-            if (container.style.display === 'block') {
-                container.style.display = 'none';
+        if ( isset($_POST["btnAddPost"])) {
+            extract($_POST);
+
+            require_once 'Upload.php';
+
+            // Retrieve data
+            $user_id=$userData["id"];
+            $timestamp = date("Y-m-d H:i:s");
+
+            // Upload profile picture
+            $post = new Upload("content", "posts");
+
+            if ($post->error) {
+                echo "Error: " . $post->error;
             } else {
-                container.style.display = 'block';
+                // Insert user data into the database
+                $stmt = $db->prepare("INSERT INTO posts (user_id, content, timestamp) VALUES (?, ?, ?)");
+                $stmt->execute([$user_id, $post->filename, $timestamp]);
+            
+                // Redirect to a success page or display a success message
+                echo "POST ADDED";
+                exit;
             }
         }
-    </script>
-
-<script>
-    document.addEventListener('DOMContentLoaded', function() {
-        var acceptButtons = document.getElementsByClassName('accept-btn');
-
-        for (var i = 0; i < acceptButtons.length; i++) {
-            acceptButtons[i].addEventListener('click', handleAcceptButtonClick);
-        }
-
-        function handleAcceptButtonClick(event) {
-            // Get the notification ID associated with the clicked button
-            var notificationId = event.target.id;
-            
-            // Perform any further actions you want with the notification ID
-            // For example, you can make an AJAX request to update the database
-            
-            // Output the notification ID to the console for testing
-            console.log('Accept button clicked for notification ID:', notificationId);
-        }
-    });
-</script>
-
+        
+    ?>
+   
+   <br>
+    <br><br>
 
     <!-- <?php seeUser($userData["email"]);?> -->
 

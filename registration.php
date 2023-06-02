@@ -70,6 +70,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         <p>Birth Date: <input type="date" name="birth_date" value="<?= $birthDate ?? "" ?>"></p>
         <p>Profile Picture : <input type="file" name="pp" value="<?= $pp ?? "" ?>"></p>
         <p><button>Register</button></p>
+        <br><br>
+        <button><a style="text-decoration:none; color:inherit;" href="mainPage.php"> Go Back to the Welcome Page</a></button>
     </form>
 </body>
 </html>
