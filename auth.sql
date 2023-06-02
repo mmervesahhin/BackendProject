@@ -59,4 +59,6 @@ CREATE TABLE IF NOT EXISTS `notifications` (
 
 INSERT INTO `users` (`email`, `password`, `name`, `surname`, `pp`, `birth_date`) 
 VALUES ('example@example.com', 'password123', 'John', 'Doe', 'profile_pic.jpg', '1990-05-01');
+INSERT INTO `notifications` (`id`, `from_id`, `to_user_id`, `type`, `content`, `timestamp`) 
+VALUES ('2', '3', '2', 'IDK', 'YORULDUM', '1999-09-09');
 COMMIT;
