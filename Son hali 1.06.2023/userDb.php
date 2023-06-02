@@ -1,7 +1,7 @@
 <?php
 
   // connection string
-  const DSN = "mysql:host=localhost;port=3306;dbname=test;charset=utf8mb4" ;
+  const DSN = "mysql:host=localhost;port=3306;dbname=project;charset=utf8mb4" ;
   const USER = "root" ;
   const PASSWORD = "" ; 
 
@@ -60,6 +60,8 @@ function searchFriend($friend,$id){
   //  }
 }
 
+
+
 function getUser($email) {
    global $db ;
    $stmt = $db->prepare("SELECT * FROM users WHERE email = ?") ; 
@@ -81,3 +83,10 @@ function sendFriendRequest($id,$user_id,$type,$content){  //
   } catch(PDOException $e) {
   return ["error" => "Error"] ;
 }}
+
+function getNotifications($toUserId) {
+  global $db;
+  $stmt = $db->prepare("SELECT * FROM notifications WHERE to_user_id = ?");
+  $stmt->execute([$toUserId]);
+  return $stmt->fetchAll();
+}
