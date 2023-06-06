@@ -48,6 +48,7 @@ $userData = $_SESSION["user"];
         $userID = $userData["id"];
         $notifications = getNotifications($userID);
         $friendRequestData = array();
+        $acceptBtnId = 1; // Initialize the ID counter
         foreach ($notifications as $notification) {
             echo '<li>' . $notification['content'];
             if ($notification['type'] == "Friend Request") {
@@ -60,7 +61,7 @@ $userData = $_SESSION["user"];
                     $toUserId = $row['to_user_id'];
 
                     $friendRequestData[] = array(
-                        'notificationId' => $notification['id'],
+                        'button' => $acceptBtnId,
                         'from_id' => $fromId,
                         'to_user_id' => $toUserId
                     );
@@ -68,8 +69,8 @@ $userData = $_SESSION["user"];
                     echo "Error executing query: " . $stmt->errorInfo()[2];
                 }
                 echo '<div class="button-container">';
-                echo '<button class="accept-btn" id="' . $notification['id'] . '"><img src="../images/accept-button.png" alt="Accept" style="width: 20px; height: 20px;"></button>';
-                echo '<button class="accept-btn" id="' . $notification['id'] . '" "><img src="../images/reject-button.png" alt="Reject" style="width: 20px; height: 20px;"></button>';
+                echo '<button class="accept-btn" id="accept" data-id="'. $acceptBtnId .'"><img src="../images/accept-button.png" alt="Accept" style="width: 20px; height: 20px;"></button>';
+                echo '<button class="accept-btn" id="reject" data-id="' . $notification['id'] . '"><img src="../images/reject-button.png" alt="Reject" style="width: 20px; height: 20px;"></button>';
                 echo '</div>';
             }
             echo '</li>';
@@ -181,6 +182,27 @@ $userData = $_SESSION["user"];
     <br><br>
 
     <!-- <?php seeUser($userData["email"]);?> -->
+
+    <script>
+    document.addEventListener('DOMContentLoaded', function() {
+        var acceptBtns = document.querySelectorAll('.accept-btn');
+        for (var i = 0; i < acceptBtns.length; i++) {
+            acceptBtns[i].addEventListener('click', function() {
+                var acceptBtnId = this.getAttribute('data-id');
+                
+                for (var j = 0; j < count($friendRequestData) j++) {
+
+                    if(acceptBtnId == $friendRequestData[j]['button'])
+                    {
+                        //insert into table with ajax 
+                    }
+
+                }
+
+            });
+        }
+    });
+</script>
 
 </body>
 </html>
