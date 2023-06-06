@@ -1,6 +1,4 @@
 <?php
-
-
   const DSN = "mysql:host=localhost;port=3306;dbname=project;charset=utf8mb4" ;
   const USER = "root" ;
   const PASSWORD = "" ; 
@@ -20,22 +18,24 @@
    return false ; 
 }
 
-/* function seeUser($email) {
-   $sql = "SELECT email FROM users";
+function seeFriendList($id) {
+   $sql = "SELECT name,surname FROM users,friends where user_id=id";
+ /*  $sql = "SELECT u.name, u.surname 
+        FROM users u
+        INNER JOIN friends f ON u.id = f.user_id
+        WHERE f.user_id = $id"; */
+
    global $db;
   
    $result = $db->query($sql);
-   
-   echo "Arkadaş ekleyebileceğin kişilerin e-posta'sı:";
    if ($result->rowCount() > 0) {
        while ($row = $result->fetch()) {
-         if($email!=$row["email"])
-           echo "" . $row["email"] . "<br>";
+           echo "" . $row["name"] . " " . $row["surname"] ."<br>";
        }
    } else {
-       echo "Kayıt bulunamadı.";
+       echo "No friends.";
    }
-} */
+} 
 
 function searchFriend($friend,$id){
   global $db;
@@ -43,24 +43,7 @@ function searchFriend($friend,$id){
    $stmt->execute([$friend,$friend,$friend,$id]);
 
   return $stmt->fetchAll();
-  
-  //  $result = $db->query($sql);
-   
-  //  if ($result->rowCount() > 0 ) {
-  //      while ($row = $result->fetch()) {
-  //        if($friend==$row["email"] || $friend==$row["name"] || $friend==$row["surname"]){
-  //          ?> <span class="invisible"><?=$row["id"] ?></span><img <?= 'src="./images/' . $row["pp"] . '" alt="Image"' ?> width="30" height="30" style="border-radius: 50%;">
-  //           <?php echo "".$row["name"] ." " .$row["surname"]." (".$row["email"].")" ?> <i class="fa-solid fa-plus"></i> <?php echo "<br>";
-           
-  //         }
-  //      }
-      
-  //  } else {
-  //      echo "There is no such user";
-  //  }
 }
-
-
 
 function getUser($email) {
    global $db ;

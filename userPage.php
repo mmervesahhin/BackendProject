@@ -4,7 +4,18 @@ require "userDb.php";
 
 // check if the user authenticated before
 if (!validSession()) {
-    header("Location: index.php?error"); // redirect to login page
+    header("Location: login.php?error"); // redirect to login page
+    exit;
+}
+
+if(isset($_POST["accept"])){
+    extract($_POST);
+    
+
+    $stmt = $db->prepare("insert into friends (user_id,friend_id) values (? , ?)") ;
+    $stmt->execute([$from_id,$to_id]) ;
+    
+    // echo "<p>istek gönderildi</p>";
     exit;
 }
 
@@ -22,7 +33,9 @@ $userData = $_SESSION["user"];
     </head>
 <body>
 
-    <div style="position: fixed; bottom: 0; right: 0;">
+
+
+    <div style="position: fixed; bottom: 0; left: 0;">
         <button><a id="logout" href="logout.php">Logout</a></button>
     </div>
 
@@ -32,14 +45,24 @@ $userData = $_SESSION["user"];
         var userData = <?php echo json_encode($userData); ?>;
     </script>
 
-    <div id="userPageContainer">
+  
         <div id="profile-box">
             <button id="notification" onclick="toggleNotifications()"><i class="fa-solid fa-bell"></i></button>
             <img src="./images/<?= $userData["pp"] ?>" alt="Image" width="50" height="50" style="border-radius: 50%;">
             <span style="margin-left:10px;"><?= $userData["name"] ?>  <?= $userData["surname"]?></span>
         </div>
 
+        <div id="friendList" style="position: fixed;top: 50;right: 0; border: 1px solid #ccc; margin-top:13px; width:235px; height:100%;">
 
+        <h3>Your Friends</h3>
+        <ul>
+            <?php
+               seeFriendList($userData["id"]);
+            ?>
+        </ul>
+        </div>
+
+    
 
         <div id="notificationsContainer" style="display: none;">
     <!-- Placeholder content for notifications -->
@@ -48,20 +71,30 @@ $userData = $_SESSION["user"];
         $userID = $userData["id"];
         $notifications = getNotifications($userID);
         $friendRequestData = array();
-        $acceptBtnId = 1; // Initialize the ID counter
         foreach ($notifications as $notification) {
+          
             echo '<li>' . $notification['content'];
+
+            // echo "<div id='enes'>enes</div>";
+
             if ($notification['type'] == "Friend Request") {
                 $query = "SELECT from_id, to_user_id FROM notifications WHERE id = ?";
                 $stmt = $db->prepare($query);
                 $stmt->execute([$notification['id']]);
                 $row = $stmt->fetch(PDO::FETCH_ASSOC);
+
+                $friendName="SELECT name,surname from users where id = ?";
+                $st=$db->prepare($friendName);
+                $st->execute([$row['from_id']]);
+                $row2 = $st->fetch(PDO::FETCH_ASSOC);
+                echo "<br>";
+                echo "-". $row2['name']. " ". $row2['surname'];
+                
                 if ($row) {
                     $fromId = $row['from_id'];
                     $toUserId = $row['to_user_id'];
 
                     $friendRequestData[] = array(
-                        'button' => $acceptBtnId,
                         'from_id' => $fromId,
                         'to_user_id' => $toUserId
                     );
@@ -69,15 +102,17 @@ $userData = $_SESSION["user"];
                     echo "Error executing query: " . $stmt->errorInfo()[2];
                 }
                 echo '<div class="button-container">';
-                echo '<button class="accept-btn" id="accept" data-id="'. $acceptBtnId .'"><img src="../images/accept-button.png" alt="Accept" style="width: 20px; height: 20px;"></button>';
-                echo '<button class="accept-btn" id="reject" data-id="' . $notification['id'] . '"><img src="../images/reject-button.png" alt="Reject" style="width: 20px; height: 20px;"></button>';
+                echo "<div class='invisible'>".$row['from_id']."</div>";
+                echo "<div class='invisible'>".$row['to_user_id']."</div>";
+                echo '<button class="accept-btn accept"><img src="./images/accept-button.png" alt="Accept" style="width: 20px; height: 20px;"></button>';
+                echo '<button class="accept-btn reject"><img src="./images/reject-button.png" alt="Reject" style="width: 20px; height: 20px;"></button>';
                 echo '</div>';
             }
             echo '</li>';
         }
         ?>
     </ul>
-</div>
+    
 
     </div>
     </div>
@@ -120,7 +155,7 @@ $userData = $_SESSION["user"];
     </div>
 
     <div id="timeline">
-        <div class="post">
+        <div class="post" style="width:150px;">
             <?php
                     // Select all posts from the "posts" table
                     $sql = "SELECT * FROM posts";
@@ -180,29 +215,5 @@ $userData = $_SESSION["user"];
    
    <br>
     <br><br>
-
-    <!-- <?php seeUser($userData["email"]);?> -->
-
-    <script>
-    document.addEventListener('DOMContentLoaded', function() {
-        var acceptBtns = document.querySelectorAll('.accept-btn');
-        for (var i = 0; i < acceptBtns.length; i++) {
-            acceptBtns[i].addEventListener('click', function() {
-                var acceptBtnId = this.getAttribute('data-id');
-                
-                for (var j = 0; j < count($friendRequestData) j++) {
-
-                    if(acceptBtnId == $friendRequestData[j]['button'])
-                    {
-                        //insert into table with ajax 
-                    }
-
-                }
-
-            });
-        }
-    });
-</script>
-
 </body>
 </html>

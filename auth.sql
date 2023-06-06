@@ -38,9 +38,10 @@ CREATE TABLE IF NOT EXISTS `comments` (
 
 DROP TABLE IF EXISTS `friends`;
 CREATE TABLE IF NOT EXISTS `friends` (
+  `friendship_id` int(100) NOT NULL AUTO_INCREMENT,
   `user_id` int(100) NOT NULL,
   `friend_id` int(100) NOT NULL,
-  PRIMARY KEY (`user_id`,`friend_id`),
+  PRIMARY KEY (`friendship_id`),
   FOREIGN KEY (`user_id`) REFERENCES users(`id`),
   FOREIGN KEY (`friend_id`) REFERENCES users(`id`)
 ) ENGINE=MyISAM DEFAULT CHARSET=latin1;
