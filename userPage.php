@@ -233,9 +233,11 @@ getDisLikeCounts();
 
         <h3>Your Friends</h3>
         <ul>
+            
             <?php
             seeFriendList($userData["id"]);
             ?>
+
         </ul>
     </div>
 
