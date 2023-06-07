@@ -39,14 +39,19 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     else {
         $hashedPassword = password_hash($password, PASSWORD_BCRYPT);
 
+
+        if (strlen($password) < 5 || strlen($password) > 15) {
+            echo "Error: Password length should be between 5 and 15 characters.";
+        }
+        else{
         // Insert user data into the database
         $stmt = $db->prepare("INSERT INTO users (email, password, name, surname, pp, birth_date) VALUES (?, ?, ?, ?, ?, ?)");
         $stmt->execute([$email, $hashedPassword, $name, $surname, $profilePicture->filename, $birthDate]);
-
         // Redirect to a success page or display a success message
         header("Location: success.php");
         exit;
-    }    
+        }
+    }  
 }
 ?>
 
@@ -60,7 +65,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <title>Document</title>
     <link rel="stylesheet" href="style.css">
 </head>
-<body>
+<body class="reg-body">
 <h1>Register</h1>
     <form action="" method="post" enctype="multipart/form-data">
         <p>Email : <input type="text" name="email" value="<?= $email ?? "" ?>"></p>

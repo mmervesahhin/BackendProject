@@ -4,7 +4,14 @@
   const PASSWORD = "" ; 
 
   // connect to database, $db represents mysql dbms
-  $db = new PDO(DSN, USER, PASSWORD) ; 
+  try {
+   $db = new PDO(DSN, USER, PASSWORD) ; 
+   $db->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION) ;
+ } catch( PDOException $ex) {
+     echo "<p>Connection Error:</p>" ;
+     echo "<p>", $ex->getMessage(), "</p>" ;
+     exit ;
+ }
 
   function checkUser($email, $rawPass) {
    global $db ;

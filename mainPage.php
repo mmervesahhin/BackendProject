@@ -7,15 +7,23 @@
     <title>Button Form Example</title>
     <link rel="stylesheet"  href="style.css">
 </head>
-<body>
-    <h1>Welcome To the Application</h1>
+<body class="main-page">
+<div class="background-image"></div>
+
+<header class="logo">
+        <img src="images/logo.png" alt="Logo">
+    </header>
+    <div class="content">
+
+    <h1>Welcome To CTISocial</h1>
     <h2>Please login if you have an account, if not you are welcome to register</h2>
     
     <form method="post">
         <button type="submit" name="login">Login</button>
         <button type="submit" name="register">Register</button>
     </form>
-    
+
+    </div>
     <?php
     // Handle form submission
     if ($_SERVER["REQUEST_METHOD"] == "POST"){

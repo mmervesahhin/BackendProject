@@ -82,5 +82,6 @@ CREATE TABLE IF NOT EXISTS `dislikes` (
   FOREIGN KEY (`post_id`) REFERENCES `posts`(`id`)
 ) ENGINE=MyISAM DEFAULT CHARSET=latin1;
 
-
+ALTER TABLE `users` ADD UNIQUE (`email`);
+ALTER TABLE `friends` ADD UNIQUE (`user_id`, `friend_id`);
 COMMIT;

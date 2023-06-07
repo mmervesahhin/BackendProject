@@ -10,7 +10,7 @@ if (!validSession()) {
     exit;
 }
 
-if (isset($_POST["accept"])) {
+if (isset($_POST["accept"]) && csrf_check()) {
     extract($_POST);
 
     $stmt = $db->prepare("insert into friends (user_id,friend_id) values (? , ?)") ;
@@ -23,6 +23,19 @@ if (isset($_POST["accept"])) {
     // echo "<p>istek gönderildi</p>";
     exit;
 }
+
+function csrf_check() { 
+    if ( isset($_POST["csrf_token"]) && isset($_COOKIE["secret"])) {
+        return password_verify($_COOKIE["secret"] . SALTING  , $_POST["csrf_token"]) ;
+    }
+    return false; 
+ }
+
+ function create_csrf_token() {
+    $secret = bin2hex(random_bytes(10)) ; // create random 10 bytes (20 hex digits)
+    setcookie("secret", $secret) ; // session cookie
+    return password_hash($secret . SALTING, PASSWORD_BCRYPT) ;
+ }
 
 if(isset($_POST["reject"])){
     extract($_POST);
@@ -302,9 +315,8 @@ getDisLikeCounts();
         <button><a id="logout" href="logout.php">Logout</a></button>
     </div>
 
-    <h3>Welcome
-        <?= $userData["name"] ?> (
-        <?= $userData["email"] ?>)
+    <h3>Welcome <?= htmlspecialchars($userData["name"]) ?> (
+    <?= htmlspecialchars($userData["email"]) ?>)
     </h3>
 
     <script>
@@ -345,7 +357,7 @@ getDisLikeCounts();
             $friendRequestData = array();
             foreach ($notifications as $notification) {
 
-                echo '<li>' . $notification['content'];
+                echo '<li>' . htmlspecialchars($notification['content']);
 
             // echo "<div id='enes'>enes</div>";
 
@@ -362,7 +374,7 @@ getDisLikeCounts();
                 $st->execute([$row['from_id']]);
                 $row2 = $st->fetch(PDO::FETCH_ASSOC);
                 echo "<br>";
-                echo "-". $row2['name']. " ". $row2['surname'];
+                echo "- " . htmlspecialchars($row2['name']) . " " . htmlspecialchars($row2['surname']);
 
                 echo '<div class="button-container">';
                 echo "<div class='invisible'>".$row['id']."</div>";
@@ -384,8 +396,8 @@ getDisLikeCounts();
     <br><br><br><br>
 
     <form action="" method="post">
-        <input type="text" id="searchText" name="friendSearch">
-        <input type="submit" value="Search Friend" name="btnFriend">
+    <input type="text" id="searchText" name="friendSearch" value="<?= isset($_POST['friendSearch']) ? htmlspecialchars($_POST['friendSearch']) : '' ?>">
+    <input type="submit" value="Search Friend" name="btnFriend">
     </form>
 
     <div id="searchPart">
@@ -422,7 +434,7 @@ getDisLikeCounts();
         <?php
         $offset = ($pageNumber - 1) * $postsPerPage; // Calculate the offset
         
-        $userId = $userData["id"];
+        $userID = intval($userData["id"]);
         $sql = "SELECT p.*, u.name AS username
         FROM posts AS p
         JOIN users AS u ON p.user_id = u.id
@@ -449,7 +461,7 @@ getDisLikeCounts();
                 // Display post content
                 echo '<div class="post" style="width:500px;">';
                 echo '<span class="nameUser">'.$row["username"].'</span>';
-                echo '<img src="./posts/' . $row["content"] . '" alt="Image" width="100" height="100">';
+                echo '<img src="./posts/' . htmlspecialchars($row["content"]) . '" alt="Image" width="100" height="100">';
                 echo '<span>Post ID: <span>' . $row["id"] . '></span></span>';
 
                 // Display like count
