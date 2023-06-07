@@ -18,7 +18,7 @@ DROP TABLE IF EXISTS `posts`;
 CREATE TABLE IF NOT EXISTS `posts` (
   `id` int(100) NOT NULL AUTO_INCREMENT,
   `user_id` INT(100) NOT NULL,
-  `content` VARCHAR(255) NOT NULL, /*Image unutma*/
+  `content` VARCHAR(255) NOT NULL,
   `timestamp` TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY (`id`),
   FOREIGN KEY (`user_id`) REFERENCES users(`id`)
@@ -30,11 +30,12 @@ CREATE TABLE IF NOT EXISTS `comments` (
   `post_id` int(100) NOT NULL,
   `user_id` INT(100) NOT NULL,
   `content` varchar(100) NOT NULL,
-  timestamp TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  `timestamp` TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY (`id`),
   FOREIGN KEY (`post_id`) REFERENCES posts(`id`),
   FOREIGN KEY (`user_id`) REFERENCES users(`id`)
 ) ENGINE=MyISAM DEFAULT CHARSET=latin1;
+
 
 DROP TABLE IF EXISTS `friends`;
 CREATE TABLE IF NOT EXISTS `friends` (
@@ -46,6 +47,7 @@ CREATE TABLE IF NOT EXISTS `friends` (
   FOREIGN KEY (`friend_id`) REFERENCES users(`id`)
 ) ENGINE=MyISAM DEFAULT CHARSET=latin1;
 
+
 DROP TABLE IF EXISTS `notifications`;
 CREATE TABLE IF NOT EXISTS `notifications` (
   `id` int(100) NOT NULL AUTO_INCREMENT,
@@ -53,13 +55,32 @@ CREATE TABLE IF NOT EXISTS `notifications` (
   `to_user_id` int(100) NOT NULL,
   `type` VARCHAR(255) NOT NULL,
   `content` VARCHAR(255),
-   timestamp TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  `timestamp` TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY (`id`),
   FOREIGN KEY (`to_user_id`) REFERENCES users(`id`)
 ) ENGINE=MyISAM DEFAULT CHARSET=latin1;
 
-INSERT INTO `users` (`email`, `password`, `name`, `surname`, `pp`, `birth_date`) 
-VALUES ('example@example.com', 'password123', 'John', 'Doe', 'profile_pic.jpg', '1990-05-01');
-INSERT INTO `notifications` (`id`, `from_id`, `to_user_id`, `type`, `content`, `timestamp`) 
-VALUES ('2', '3', '2', 'IDK', 'YORULDUM', '1999-09-09');
+DROP TABLE IF EXISTS `likes`;
+CREATE TABLE IF NOT EXISTS `likes` (
+  `id` int(100) NOT NULL AUTO_INCREMENT,
+  `user_id` int(100) NOT NULL,
+  `post_id` int(100) NOT NULL,
+  `timestamp` TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (`id`),
+  FOREIGN KEY (`user_id`) REFERENCES users(`id`),
+  FOREIGN KEY (`post_id`) REFERENCES posts(`id`)
+) ENGINE=MyISAM DEFAULT CHARSET=latin1;
+
+DROP TABLE IF EXISTS `dislikes`;
+CREATE TABLE IF NOT EXISTS `dislikes` (
+  `id` int(100) NOT NULL AUTO_INCREMENT,
+  `user_id` int(100) NOT NULL,
+  `post_id` int(100) NOT NULL,
+  `timestamp` TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (`id`),
+  FOREIGN KEY (`user_id`) REFERENCES `users`(`id`),
+  FOREIGN KEY (`post_id`) REFERENCES `posts`(`id`)
+) ENGINE=MyISAM DEFAULT CHARSET=latin1;
+
+
 COMMIT;
