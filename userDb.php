@@ -1,7 +1,7 @@
 <?php
-  const DSN = "mysql:host=localhost;port=8889;dbname=projectNew;charset=utf8mb4" ;
+  const DSN = "mysql:host=localhost;port=3306;dbname=project;charset=utf8mb4" ;
   const USER = "root" ;
-  const PASSWORD = "root" ; 
+  const PASSWORD = "" ; 
 
   // connect to database, $db represents mysql dbms
   $db = new PDO(DSN, USER, PASSWORD) ; 
@@ -19,8 +19,7 @@
 }
 
 function seeFriendList($id) {
-  // $sql = "SELECT name,surname FROM users,friends where user_id=id";
-   $sql = "SELECT u.name, u.surname 
+   $sql = "SELECT u.name, u.surname, f.user_id, f.friend_id
         FROM users u
         JOIN friends f ON u.id = f.user_id or f.friend_id=u.id
         WHERE (f.friend_id = $id or f.user_id=$id) and u.id != $id" ; 
@@ -29,12 +28,17 @@ function seeFriendList($id) {
 
    $result = $db->query($sql);
    if ($result->rowCount() > 0) {
+          echo "<ul>";
        while ($row = $result->fetch()) {
-           echo "" . $row["name"] . " " . $row["surname"] ."<br>";
+          echo "<li>";
+          echo "<div class='invisible'>".$row['user_id']."</div>"; //kim
+          echo "<div class='invisible'>".$row['friend_id']."</div>"; //kime
+          echo "" . $row["name"] . " " . $row["surname"] ."     <i class='fa-solid fa-trash'></i>"."</li><br>";
        }
    } else {
        echo "No friends.";
    }
+          echo "</ul>";
 } 
 
 function searchFriend($friend,$id){
@@ -55,17 +59,6 @@ function getUser($email) {
   function validSession() {
    return isset($_SESSION["user"]) ;
 }
-
-function sendFriendRequest($id,$user_id,$type,$content){  //
-  global $db;
-  try{
-    $stmt=$db->prepare("insert into notifications (id,user_id,type,content) values (?, ?, ?, ?)");
-    $stmt->execute([$id,$user_id,$type,$content]);
-    // $id = $db->lastInsertId() ;
-    return ["id" => $id, "user_id" => $user_id, "type" => $type, "content" => $content];
-  } catch(PDOException $e) {
-  return ["error" => "Error"] ;
-}}
 
 function getNotifications($toUserId) {
   global $db;

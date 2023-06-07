@@ -2,6 +2,8 @@
 session_start();
 require "userDb.php";
 
+$userData = $_SESSION["user"];
+
 // check if the user authenticated before
 if (!validSession()) {
     header("Location: login.php?error"); // redirect to login page
@@ -11,15 +13,40 @@ if (!validSession()) {
 if (isset($_POST["accept"])) {
     extract($_POST);
 
+    $stmt = $db->prepare("insert into friends (user_id,friend_id) values (? , ?)") ;
+    $stmt->execute([$from_id,$to_id]) ;
 
-    $stmt = $db->prepare("insert into friends (user_id,friend_id) values (? , ?)");
-    $stmt->execute([$from_id, $to_id]);
 
+    $st = $db->prepare("delete from notifications where id = (?)") ;
+    $st->execute([$notId]) ;
+    
     // echo "<p>istek gönderildi</p>";
     exit;
 }
 
-$userData = $_SESSION["user"];
+if(isset($_POST["reject"])){
+    extract($_POST);
+
+    $st = $db->prepare("delete from notifications where id = (?)") ;
+    $st->execute([$not_id]) ;
+
+    exit;
+}
+
+if(isset($_POST["delete"])){
+    extract($_POST);
+
+    $type="Remove Friend";
+    $content=$userData["name"] ." " .$userData["surname"] ." removed you from friendship";
+
+    $stmt = $db->prepare("insert into notifications (from_id,to_user_id,type,content) values (? , ?, ?, ?)") ;
+    $stmt->execute([$toWhom,$who,$type,$content]) ;
+
+    $st = $db->prepare("delete from friends where user_id = (?) and friend_id= (?)") ;
+    $st->execute([$who,$toWhom]) ;
+    
+    exit;
+}
 
 //FOR POST FUNCTION TO WORK PROPERLY//
 // Check if a post was just added
@@ -202,9 +229,6 @@ getDisLikeCounts();
 </head>
 
 <body>
-
-
-
     <div style="position: fixed; bottom: 0; left: 0;">
         <button><a id="logout" href="logout.php">Logout</a></button>
     </div>
@@ -254,44 +278,36 @@ getDisLikeCounts();
 
                 echo '<li>' . $notification['content'];
 
-                // echo "<div id='enes'>enes</div>";
-            
-                if ($notification['type'] == "Friend Request") {
-                    $query = "SELECT from_id, to_user_id FROM notifications WHERE id = ?";
-                    $stmt = $db->prepare($query);
-                    $stmt->execute([$notification['id']]);
-                    $row = $stmt->fetch(PDO::FETCH_ASSOC);
+            // echo "<div id='enes'>enes</div>";
 
-                    $friendName = "SELECT name,surname from users where id = ?";
-                    $st = $db->prepare($friendName);
-                    $st->execute([$row['from_id']]);
-                    $row2 = $st->fetch(PDO::FETCH_ASSOC);
-                    echo "<br>";
-                    echo "-" . $row2['name'] . " " . $row2['surname'];
+            if ($notification['type'] == "Friend Request") {
+                $query = "SELECT id,from_id, to_user_id FROM notifications WHERE id = ?";
+                $stmt = $db->prepare($query);
+                $stmt->execute([$notification['id']]);
+                $row = $stmt->fetch(PDO::FETCH_ASSOC);
 
-                    if ($row) {
-                        $fromId = $row['from_id'];
-                        $toUserId = $row['to_user_id'];
+                // No notifications yazdır
 
-                        $friendRequestData[] = array(
-                            'from_id' => $fromId,
-                            'to_user_id' => $toUserId
-                        );
-                    } else {
-                        echo "Error executing query: " . $stmt->errorInfo()[2];
-                    }
-                    echo '<div class="button-container">';
-                    echo "<div class='invisible'>" . $row['from_id'] . "</div>";
-                    echo "<div class='invisible'>" . $row['to_user_id'] . "</div>";
-                    echo '<button class="accept-btn accept"><img src="./images/accept-button.png" alt="Accept" style="width: 20px; height: 20px;"></button>';
-                    echo '<button class="accept-btn reject"><img src="./images/reject-button.png" alt="Reject" style="width: 20px; height: 20px;"></button>';
-                    echo '</div>';
-                }
-                echo '</li>';
+                $friendName="SELECT name,surname from users where id = ?";
+                $st=$db->prepare($friendName);
+                $st->execute([$row['from_id']]);
+                $row2 = $st->fetch(PDO::FETCH_ASSOC);
+                echo "<br>";
+                echo "-". $row2['name']. " ". $row2['surname'];
+
+                echo '<div class="button-container">';
+                echo "<div class='invisible'>".$row['id']."</div>";
+                echo "<div class='invisible'>".$row['from_id']."</div>";
+                echo "<div class='invisible'>".$row['to_user_id']."</div>";
+                echo '<button class="accept-btn accept" style="cursor:pointer;"><img src="./images/accept-button.png" alt="Accept" style="width: 20px; height: 20px;"></button>';
+                echo '<button class="reject-btn reject" style="cursor:pointer;"><img src="./images/reject-button.png" alt="Reject" style="width: 20px; height: 20px;"></button>';
+                echo '</div>';
             }
-            ?>
-        </ul>
-
+            echo '</li>';
+        }
+        ?>
+    </ul>
+    
 
     </div>
     </div>
@@ -362,7 +378,7 @@ getDisLikeCounts();
             // Output data of each row
             while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
                 // Display post content
-                echo '<div class="post">';
+                echo '<div class="post" style="width:500px;">';
                 echo '<span class="nameUser">'.$row["username"].'</span>';
                 echo '<img src="./posts/' . $row["content"] . '" alt="Image" width="100" height="100">';
                 echo '<span>Post ID: <span>' . $row["id"] . '></span></span>';
@@ -420,9 +436,99 @@ getDisLikeCounts();
         <input type="file" name="content" id="content">
     </form>
 
+    <?php 
 
-    <br>
-    <br><br>
+        if ( isset($_POST["btnAddPost"])) {
+            extract($_POST);
+
+            require_once 'Upload.php';
+
+            // Retrieve data
+            $user_id=$userData["id"];
+            $timestamp = date("Y-m-d H:i:s");
+
+            // Upload profile picture
+            $post = new Upload("content", "posts");
+
+            if ($post->error) {
+                echo "Error: " . $post->error;
+            } else {
+                // Insert user data into the database
+                $stmt = $db->prepare("INSERT INTO posts (user_id, content, timestamp) VALUES (?, ?, ?)");
+                $stmt->execute([$user_id, $post->filename, $timestamp]);
+            
+                // Redirect to a success page or display a success message
+                echo "POST ADDED";
+                exit;
+            }
+        }
+        
+    ?>
+   
+   <br><br><br>
+
+    <script>
+    $(document).ready(function(){
+        $('.accept').on('click',function(){
+            let notId = $(this).prev().prev().prev().text();
+            let from_id = $(this).prev().prev().text(); 
+            let to_id = $(this).prev().text();
+            let parent = $(this).parent().parent();
+              $.ajax({
+                url: 'userPage.php',
+                type: 'post',
+                data: {
+                  'accept': 1,
+                  'from_id': from_id,
+                  'to_id': to_id,
+                  'notId': notId
+                },
+                success: function(data) {
+                  //parent.html(data);
+                    parent.remove();
+                
+                }
+              })
+ })
+
+ $('.reject').on('click',function(){
+            let not_id = $(this).prev().prev().prev().prev().text(); 
+            let parent = $(this).parent().parent();
+              $.ajax({
+                url: 'userPage.php',
+                type: 'post',
+                data: {
+                  'reject': 1,
+                  'not_id': not_id
+                },
+                success: function(data) {
+                  //parent.html(data);
+                    parent.remove();
+                }
+              })
+ })
+
+ $('.fa-trash').on('click',function(){
+            let who = $(this).prev().prev().text();;
+            let toWhom = $(this).prev().text(); 
+            let parent = $(this).parent();
+              $.ajax({
+                url: 'userPage.php',
+                type: 'post',
+                data: {
+                  'delete': 1,
+                  'who': who,
+                  'toWhom': toWhom
+                },
+                success: function(data) {
+                  //parent.html(data);
+                    parent.remove();
+                }
+              })
+ })
+});
+    </script>
+
 </body>
 
 </html>

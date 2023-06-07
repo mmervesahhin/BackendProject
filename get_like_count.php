@@ -1,6 +1,6 @@
 <?php
 // Connect to the database using PDO
-$db = new PDO("mysql:host=localhost;dbname=projectNew;charset=utf8mb4", "root", "root");
+$db = new PDO("mysql:host=localhost;dbname=project;charset=utf8mb4", "root", "");
 
 // Retrieve the post_id from the request data
 $postId = $_GET['post_id'];
