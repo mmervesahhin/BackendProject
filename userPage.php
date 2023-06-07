@@ -11,7 +11,6 @@ if (!validSession()) {
 if(isset($_POST["accept"])){
     extract($_POST);
     
-
     $stmt = $db->prepare("insert into friends (user_id,friend_id) values (? , ?)") ;
     $stmt->execute([$from_id,$to_id]) ;
     
@@ -56,9 +55,11 @@ $userData = $_SESSION["user"];
 
         <h3>Your Friends</h3>
         <ul>
+            
             <?php
                seeFriendList($userData["id"]);
             ?>
+
         </ul>
         </div>
 

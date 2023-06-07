@@ -19,14 +19,14 @@
 }
 
 function seeFriendList($id) {
-   $sql = "SELECT name,surname FROM users,friends where user_id=id";
- /*  $sql = "SELECT u.name, u.surname 
+  // $sql = "SELECT name,surname FROM users,friends where user_id=id";
+   $sql = "SELECT u.name, u.surname 
         FROM users u
-        INNER JOIN friends f ON u.id = f.user_id
-        WHERE f.user_id = $id"; */
+        JOIN friends f ON u.id = f.user_id or f.friend_id=u.id
+        WHERE (f.friend_id = $id or f.user_id=$id) and u.id != $id" ; 
 
    global $db;
-  
+
    $result = $db->query($sql);
    if ($result->rowCount() > 0) {
        while ($row = $result->fetch()) {

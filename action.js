@@ -13,8 +13,8 @@ $(document).ready(function(){
   $('.accept').on('click',function(){
     let from_id = $(this).prev().prev().text(); 
     let to_id = $(this).prev().text();
-    // let parent = $(this).parent().parent().find('#enes') ;
-    // console.log(parent);
+    let parent = $(this).parent().parent().parent();
+    alert("bastkk");
       $.ajax({
         url: 'userPage.php',
         type: 'post',
@@ -24,7 +24,9 @@ $(document).ready(function(){
           'to_id': to_id
         },
         success: function(data) {
-          // parent.html(data);
+          //parent.html(data);
+      
+          // parent.remove();
         }
       })
   })
