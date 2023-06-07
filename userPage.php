@@ -143,6 +143,47 @@ $pageNumber = isset($_GET['page']) ? intval($_GET['page']) : 1; // Current page 
                     }
                 });
             });
+
+
+            //Comment button event
+            $("#timeline").on("click", ".submitCommentButton", function () {
+                var postId = $(this).data("post-id");
+                var commentInput = $(this).siblings(".commentInput").val();
+                var userData = <?php echo json_encode($userData); ?>;
+
+                // Reference to the submit button element
+                var $submitCommentButton = $(this);
+
+                // Send an AJAX request to add the comment
+                $.ajax({
+                    url: "add_comment.php",
+                    method: "POST",
+                    data: { postId: postId, comment: commentInput, userData: userData },
+                    dataType: "json",
+                    success: function (response) {
+                        if (response.success) {
+                            // Comment added successfully
+                            console.log("Comment added.");
+
+                            // Clear the comment input field
+                            $submitCommentButton.siblings(".commentInput").val("");
+
+                            // Refresh the comments for the post
+                            refreshComments(postId);
+
+                            getCommentsForPost();
+                        } else {
+                            console.log("Failed to add comment.");
+                            getCommentsForPost();
+                        }
+                    },
+                    error: function () {
+                        console.log("Error occurred while adding comment.");
+                    }
+                });
+            });
+
+
         });
 
         // Function to retrieve like counts for all posts
@@ -195,6 +236,34 @@ getLikeCounts();
 
 //retrive initial dislike counts
 getDisLikeCounts();
+
+// Function to retrieve like counts for all posts
+        function getCommentsForPost() {
+            console.log("get Comments");
+            $(".post").each(function () {
+                var postId = $(this).find(".submitCommentButton").data("post-id");
+                var $postElement = $(this); // Store the reference to the post element
+                // Send an AJAX request to retrieve the like count for the post
+                $.ajax({
+                    url: "get_comments.php",
+                    method: "GET",
+                    data: { post_id: postId },
+                    dataType: "json",
+                    success: function (data) {
+                        const contentArray = data.map(obj => obj.username + ": " + obj.content);
+                        console.log(data);
+                        console.log(contentArray);
+                        // Update the like count element with the retrieved value
+                        $postElement.find(".Comments").text("Comments:" + contentArray);
+                    },
+                    error: function () {
+                        console.log("Error occurred while retrieving comments");
+                    }
+                });
+            });
+        }
+
+        
 
 
     </script>
@@ -377,6 +446,13 @@ getDisLikeCounts();
                 echo '<span class="dislikeCount">Dislikes: <span id="dislikeCount_' . $row["id"] . '"></span></span>';
                 // Display dislike button
                 echo '<button class="dislikeButton" data-post-id="' . $row["id"] . '">Dislike</button>';
+
+                //COMMENT INPUT AND BUTTON and OUTPUT
+                echo '<script>getCommentsForPost(' . $row["id"] . ');</script>';
+                echo '<input type="text" class="commentInput" placeholder="Enter a comment">';
+                echo '<button class="submitCommentButton" data-post-id="' . $row["id"] . '">Submit</button>';
+                echo '<span class="Comments">Comments: <span id="comment_' . $row["id"] . '"></span></span>';
+
                 echo '</div>';
 
             }
@@ -408,6 +484,7 @@ getDisLikeCounts();
         }
 
         // Call the function to retrieve and update the like counts
+        
         echo '<script>getLikeCounts();</script>';
         echo '<script>getDisLikeCounts();</script>';
         ?>
